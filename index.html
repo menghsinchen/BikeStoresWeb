@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>BikerStores</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/kendo.common.min.css" />
+    <link rel="stylesheet" href="css/kendo.bootstrap.min.css" />
+    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="js/kendo.all.min.js"></script>
+    <script>
+        $(function () {
+
+            $("#files").kendoUpload({
+                async: {
+                    autoUpload: false,
+                    saveUrl: 'http://localhost/BikeStoresAPI/Store/CreateStore'
+                },
+                validation: {
+                    allowedExtensions: [".csv"]
+                },
+                multiple: false,
+                upload: function (e) {
+                    e.preventDefault();
+                    var file = e.files[0].rawFile;
+                    var formData = new FormData();
+                    formData.append("file", file);
+                    console.log(file);
+
+                    $.ajax({
+                        url: "http://localhost/BikeStoresAPI/Store/CreateStore",
+                        type: 'post',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data, textStatus, xhr) {
+                            console.log(xhr.status);
+                        },
+                        error: function (data, textStatus, xhr) {
+                            console.log(xhr.status);
+                        }
+                    });
+                }
+            });
+
+            $("#grid").kendoGrid({
+                dataSource: {
+                    transport: {
+                        read: (options) => {
+                            $.ajax({
+                                url: "http://localhost/BikeStoresAPI/Store/All",
+                                success: function (result) {
+                                    options.success(result);
+                                },
+                                error: function (result) {
+                                    options.error(result);
+                                }
+                            });
+                        }
+                    },
+                },
+                height: window.innerHeight - 200,
+                resizable: true,
+                reorderable: true,
+                selectable: 'row',
+                filterable: true,
+                sortable: true,
+                pageable: {
+                    numeric: false,
+                    previousNext: false,
+                    refresh: true,
+                    position: 'top',
+                    pageSize: 100
+                },
+                scrollable: {
+                    endless: true,
+                    virtual: true
+                },
+                columns: [
+                    { hidden: true, field: "storeId", title: "Store Id" },
+                    { field: "storeName", title: "Store Name", filterable: { multi: true, search: true } },
+                    { field: "phone", title: "Phone", filterable: { multi: true, search: true } },
+                    { field: "email", title: "Email", filterable: { multi: true, search: true } },
+                    { field: "street", title: "Street", filterable: { multi: true, search: true } },
+                    { field: "city", title: "City", filterable: { multi: true, search: true } },
+                    { field: "state", title: "State", filterable: { multi: true, search: true } },
+                    { field: "zipCode", title: "Zip Code", filterable: { multi: true, search: true } },
+                    { command: "destroy", title: "&nbsp;", width: 120 }
+                ],
+                editable: true,
+                remove: function(e) {
+                    $.ajax({
+                        url: "http://localhost/BikeStoresAPI/Store/Delete?" + $.param({ "id": e.model.storeId }),
+                        type: 'delete',
+                        success: function (result) {
+                            console.log("StoreId", e.model.storeId, "removed");
+                        },
+                        error: function (result) {
+                            options.error(result);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold">BikerStores</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid">
+        <input name="files" id="files" type="file" />
+        <hr>
+        <div id="grid"></div>
+    </div>
+
+</body>
+
+</html>
