@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>BikerStores</title>
+    <title>BikeStores</title>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/kendo.common.min.css" />
     <link rel="stylesheet" href="css/kendo.bootstrap.min.css" />
@@ -18,7 +18,7 @@
             $("#files").kendoUpload({
                 async: {
                     autoUpload: false,
-                    saveUrl: 'http://localhost/BikeStoresAPI/Store/CreateStore'
+                    saveUrl: 'http://localhost/BikeStoresAPI/Store/Create'
                 },
                 validation: {
                     allowedExtensions: [".csv"]
@@ -32,7 +32,7 @@
                     console.log(file);
 
                     $.ajax({
-                        url: "http://localhost/BikeStoresAPI/Store/CreateStore",
+                        url: "http://localhost/BikeStoresAPI/Store/Create",
                         type: 'post',
                         data: formData,
                         processData: false,
